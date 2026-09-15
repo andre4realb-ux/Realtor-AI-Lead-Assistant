@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect With an Agent</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fa;padding:30px}
+.form{max-width:500px;margin:30px auto;background:white;padding:30px;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,.1)}
+h1{color:#123b5d}
+input,select,button{width:100%;padding:13px;margin:8px 0;border:1px solid #ccc;border-radius:8px;font-size:16px}
+button{background:#123b5d;color:white;border:0;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="form">
+<h1>Connect With an Agent</h1>
+<p>Leave your details and a real estate professional can follow up with you.</p>
+
+<input id="name" placeholder="Full name">
+<input id="contact" placeholder="Phone number or email">
+<select id="interest">
+<option value="">I am interested in...</option>
+<option>Buying</option>
+<option>Selling</option>
+<option>Renting</option>
+</select>
+<input id="location" placeholder="Preferred location">
+<input id="budget" placeholder="Budget">
+<input id="timeline" placeholder="When do you plan to move/buy/sell?">
+<select id="financing">
+<option value="">Financing status...</option>
+<option>Cash</option>
+<option>Pre-approved</option>
+<option>Financing needed</option>
+<option>Exploring options</option>
+</select>
+
+<button onclick="submitLead()">Request Agent Contact</button>
+<p id="result"></p>
+</div>
+
+<script>
+async function submitLead(){
+const name=document.getElementById("name").value.trim();
+const contact=document.getElementById("contact").value.trim();
+const interest=document.getElementById("interest").value;
+const location=document.getElementById("location").value.trim();
+const budget=document.getElementById("budget").value.trim();
+const timeline=document.getElementById("timeline").value.trim();
+const financing=document.getElementById("financing").value;
+
+if(!name||!contact||!interest){
+document.getElementById("result").textContent="Please complete your name, contact and interest.";
+return;
+}
+
+try{
+const response=await fetch("/lead",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name,contact,interest,location,budget,timeline,financing})
+});
+
+const result=await response.json();
+
+if(!response.ok){
+throw new Error(result.error||"Unable to save lead");
+}
+
+document.getElementById("result").textContent=
+"Thank you, "+name+". Your enquiry has been recorded for agent follow-up.";
+
+}catch(error){
+document.getElementById("result").textContent=
+"We could not submit your enquiry right now. Please try again.";
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate AI Assistant</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fa;color:#17202a}
+.header{background:#123b5d;color:white;padding:28px 20px;text-align:center}
+.header h1{margin:0 0 8px;font-size:28px}
+.header p{margin:0;opacity:.9}
+.chat{max-width:720px;margin:28px auto;background:white;border-radius:16px;box-shadow:0 6px 25px rgba(0,0,0,.1);overflow:hidden}
+#messages{height:430px;overflow-y:auto;padding:22px}
+.message{margin:12px 0;padding:13px 16px;border-radius:14px;max-width:85%;line-height:1.5;white-space:pre-wrap}
+.bot{background:#edf2f6;margin-right:auto}
+.user{background:#123b5d;color:white;margin-left:auto}
+.quick{display:flex;gap:8px;padding:0 18px 14px;flex-wrap:wrap}
+.quick button{background:white;color:#123b5d;border:1px solid #123b5d;padding:9px 14px;border-radius:20px;cursor:pointer}
+.input-area{display:flex;border-top:1px solid #ddd;padding:12px;gap:10px}
+input{flex:1;padding:14px;border:1px solid #ccc;border-radius:9px;font-size:16px}
+.send{background:#123b5d;color:white;border:0;padding:0 22px;border-radius:9px;font-size:16px}
+button{cursor:pointer}
+.send:disabled{opacity:.6}
+.footer{text-align:center;padding:15px;font-size:13px;color:#68737d}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>Real Estate AI Assistant</h1>
+<p>Get quick answers and connect with a real estate professional.</p>
+</div>
+
+<div class="chat">
+<div id="messages">
+<div class="message bot">Hello! 👋 Welcome. Are you looking to buy, sell, or rent a property?</div>
+</div>
+
+<div class="quick">
+<button onclick="quick('I want to buy a property')">🏠 Buy</button>
+<button onclick="quick('I want to sell my property')">💰 Sell</button>
+<button onclick="quick('I am looking to rent a property')">🔑 Rent</button>
+</div>
+
+<div class="input-area">
+<input id="messageInput" placeholder="Ask about buying, selling or renting...">
+<button class="send" id="sendButton" onclick="sendMessage()">Send</button>
+</div>
+
+<div class="footer">AI-powered lead assistance • Connect with an agent for property-specific information</div>
+</div>
+
+<script>
+const messages=[];
+const input=document.getElementById("messageInput");
+const sendButton=document.getElementById("sendButton");
+
+input.addEventListener("keydown",e=>{if(e.key==="Enter")sendMessage()});
+
+function addMessage(text,type){
+const div=document.createElement("div");
+div.className="message "+type;
+div.textContent=text;
+document.getElementById("messages").appendChild(div);
+const box=document.getElementById("messages");
+box.scrollTop=box.scrollHeight;
+}
+
+function quick(text){
+input.value=text;
+sendMessage();
+}
+
+async function sendMessage(){
+const text=input.value.trim();
+if(!text)return;
+
+addMessage(text,"user");
+messages.push({role:"user",text:text});
+input.value="";
+sendButton.disabled=true;
+
+try{
+const response=await fetch("/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:text,history:messages.slice(0,-1)})
+});
+const data=await response.json();
+
+if(data.reply){
+addMessage(data.reply,"bot");
+messages.push({role:"assistant",text:data.reply});
+}else{
+addMessage("Sorry, I couldn't process that request.","bot");
+}
+}catch(error){
+addMessage("The AI assistant is temporarily unavailable.","bot");
+}
+
+sendButton.disabled=false;
+input.focus();
+}
+</script>
+
+<div style="text-align:center;margin:20px 0;">
+  <a href="lead.html" style="display:inline-block;padding:12px 22px;background:#123b5d;color:white;text-decoration:none;border-radius:8px;">
+    Connect with an Agent
+  </a>
+</div>
+
+</body>
+</html>
