@@ -13,6 +13,21 @@ load_dotenv(BASE_DIR /'.env')
 app = Flask(__name__)
 CORS(app)
 
+@app.route("/")
+def index():
+    return (BASE_DIR.parent / "frontend" / "index.html").read_text()
+
+@app.route("/lead.html")
+def lead_page():
+    return (BASE_DIR.parent / "frontend" / "lead.html").read_text()
+
+@app.route("/<path:filename>")
+def frontend_files(filename):
+    file_path = BASE_DIR.parent / "frontend" / filename
+    if file_path.exists() and file_path.is_file():
+        return file_path.read_text()
+    return jsonify({"error": "Not found"}), 404
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 GEMINI_MODELS = [
