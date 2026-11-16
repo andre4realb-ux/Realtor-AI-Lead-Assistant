@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 backend/.env
 data/leads.json
+.backup/
+Realtor-AI-Lead-Assistant/
